@@ -2,39 +2,35 @@
 #include <stdlib.h>
 #include <time.h>
 
-const char *datafile[]={ "fortune.dat", "~/fortune.dat", "~/bin/fortune.dat", "/usr/bin/fortune.dat", "/usr/include/fortune.dat" };
+const char *datafile[]={ "fortune.dat", "~/fortune.dat", "~/bin/fortune.dat", "/usr/bin/fortune.dat", "/usr/include/fortune.dat" }; // add fortune.dat locations per se
 
 int main()
 {
-  int i=0;
-  char c;
+  int c, i=0, r;
   FILE *f;
-  
+   
+   // locate fortune.dat
    while (!f && datafile[i])
     f=fopen(datafile[i++], "r");
    if (!f) {
     printf("missing fortune.dat file.\n");
    exit(-1); }
-   srand(time(NULL)); 
-
-   i=0;
-   while (c!=EOF) {
-    c=fgetc(f);
-    if (c=='\0') 
-   ++i; }
+   // read number of cookies
+   while ((c=fgetc(f))!=EOF)
+    i+=(c=='\0') ? 1 : 0;
    rewind(f);
-   
-   int r=rand() % (i-1) + 1;
+   // randomize
+   srand(time(NULL)); 
+   r=rand() % (i-1) + 1;
+   // read to randomly selected cookie
    i=0;
-   while (i<r) {
-    c=fgetc(f);
-    if (c=='\0')
-   ++i; }
-   c='.';
-   while (c!='\0' && c!=EOF) {
-    c=fgetc(f);
-   putchar(c); }
-
+   while (i<r)
+    i+=((c=fgetc(f))=='\0') ? 1 : 0;
+   // display fortune cookie
+   while ((c=fgetc(f))!='\0')
+    putchar(c);
+   fclose(f);
+   
   return 0;
 }
 
