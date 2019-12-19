@@ -1,25 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
+#include <time.h>
 
 #define MAXPATH 1000
 #define PARTPATH 100
 
-int retrievepathpart(char pathpart[100]);
+int retrievepathpart(char pathpart[PARTPATH]);
 char path[MAXPATH];
 
 int main()
 {
   int c, i=0, r;
-  char datafile[PARTPATH];
+  char datafile[100];
   FILE *f;
    
    // locate fortune.dat
    strcpy(path, ".:"); // add pwd
    strcat(path, getenv("PATH")); // add system path
    while ((c=retrievepathpart(datafile))) {
-    strcat(datafile, "/fortune.dat");
+    strcat(datafile, "/fortunes.dat");
     if ((f=fopen(datafile, "r")))
    break; }
    if (!f) {
@@ -27,7 +27,7 @@ int main()
    exit(1); }
    // read number of cookies
    while ((c=fgetc(f))!=EOF)
-    i+=(c=='\0') ? 1 : 0;
+    i+=(c=='%') ? 1 : 0;
    rewind(f);
    // randomize
    srand(time(NULL)); 
@@ -35,9 +35,10 @@ int main()
    // read to randomly selected cookie
    i=0;
    while (i<r)
-    i+=((c=fgetc(f))=='\0') ? 1 : 0;
+    i+=((c=fgetc(f))=='%') ? 1 : 0;
    // display fortune cookie
-   while ((c=fgetc(f))!='\0')
+   fgetc(f); // read newline
+   while ((c=fgetc(f))!='%' && f)
     putchar(c);
    fclose(f);
    
@@ -48,15 +49,15 @@ int main()
 int retrievepathpart(char pathpart[])
 {
   int i1=0;
-  static int i;
+  static int i=0;
   
-  if (i==strlen(path))
+  if (i1==strlen(path))
    return 0;
    
    while (path[i]!=':' && i<strlen(path))
     pathpart[i1++]=path[i++];
    ++i; // for next operation
    pathpart[i1]='\0';
-  
+   
  return 1;
 }
