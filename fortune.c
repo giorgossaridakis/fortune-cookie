@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
-const char *datafile[]={ "fortune.dat", "~/fortune.dat", "~/bin/fortune.dat", "/usr/bin/fortune.dat", "/usr/include/fortune.dat" }; // add fortune.dat locations per se
+int retrievepathpart(char pathpart[100]);
+char *path;
 
 int main()
 {
   int c, i=0, r;
+  char datafile[100];
   FILE *f;
    
    // locate fortune.dat
-   while (!f && datafile[i])
-    f=fopen(datafile[i++], "r");
+   path=getenv("PATH");
+   while ((c=retrievepathpart(datafile))) {
+    strcat(datafile, "/fortune.dat");
+    if ((f=fopen(datafile, "r")))
+   break; }
    if (!f) {
     printf("missing fortune.dat file.\n");
-   exit(-1); }
+   exit(1); }
    // read number of cookies
    while ((c=fgetc(f))!=EOF)
     i+=(c=='\0') ? 1 : 0;
@@ -34,3 +40,19 @@ int main()
   return 0;
 }
 
+// retrieve path part
+int retrievepathpart(char pathpart[])
+{
+  int i1=0;
+  static int i=0;
+  
+  if (i1==strlen(path))
+   return 0;
+   
+   while (path[i]!=':' && i<strlen(path)) {
+    pathpart[i1++]=path[i];
+   ++i; }
+   pathpart[i1]='\0';
+   
+ return 1;
+}
