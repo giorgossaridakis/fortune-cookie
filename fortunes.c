@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define FORTUNEFILEPATH "/home/giorgos/bin/fortunes.dat"
+#define FORTUNEFILEPATH "/~/bin/fortunes.dat" // local bin folder
 #define SEPARATIONCHAR '%'
 
 int main()
